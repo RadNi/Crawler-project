@@ -1,13 +1,15 @@
 // require('events').EventEmitter.defaultMaxListeners = 11
 
 
-var Crawler = require("crawler");
-const jsdom = require("jsdom");
+const Crawler = require("crawler");
+const DB = require('./custom-db');
+var parser = require('url-parse');
 
-const { JSDOM } = jsdom;
+var db = new DB();
+
 
 var baseURLS = ['http://www.google.com/','http://www.yahoo.com', 'http://www.amazon.com', 'http://www.sharif.ir/home'];
-var depth = 4
+var depth = 3
 var counter = 0
 
 var urls = new Set()
@@ -46,6 +48,10 @@ var c = new Crawler({
                         if (tags[a].attribs.href.startsWith("www") || tags[a].attribs.href.startsWith("http") || tags[a].attribs.href.startsWith("https")) {
                             // console.log(res.request.uri.href)
                             urls.add(tags[a].attribs.href)
+                            temp = []
+                            temp.push(tags[a].attribs.href, parser(tags[a].attribs.href, true).hostname)
+                            console.log(temp)
+                            db.parallelize(db.insert, temp)
                         }
                     }
                 }
@@ -67,7 +73,13 @@ c.on('drain',function(){
         console.log("size:", urls.size, " counter:", counter)
         console.log(beforeTime.getHours() + ":" + beforeTime.getMinutes() + ":" + beforeTime.getSeconds())
         console.log(new Date().getHours() + ":" + new Date().getMinutes() + ":" + new Date().getSeconds())
-
+        // temp = []
+        // for(u of urls){
+        //     temp.push(u, parser(u, true).hostname)
+        // }
+        // console.log(temp)
+        // db.parallelize(db.insert, temp)
+        db.close()
 
     }
     else {
@@ -79,3 +91,8 @@ c.on('drain',function(){
     }
 });
 
+
+
+// db.parallelize(db.select, "google.com")
+// db.parallelize(db.insert, ["http://pandarian.radni.ir", "radni.ir"])
+// db.close()
