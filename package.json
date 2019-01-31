@@ -1,0 +1,15 @@
+{
+  "name": "crawler-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "author": "radni",
+  "license": "ISC",
+  "dependencies": {
+    "crawler": "^1.2.0",
+    "jsdom": "^13.2.0"
+  }
+}
