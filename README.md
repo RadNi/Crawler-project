@@ -38,3 +38,7 @@ Starting from the base points to crawl specific hostname:
 
 `npm run base`
 
+For custom mode that only uses configs specified:
+
+`npm run crawl`
+
