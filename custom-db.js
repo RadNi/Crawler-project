@@ -11,9 +11,10 @@ class CustomDataBase{
         });
     }
     parallelize(func, input){
-        CustomDataBase.prototype.db.parallelize(() => {
-            func(input)
-        });
+        // return CustomDataBase.prototype.db.parallelize(() => {
+        //     let p = func(input);
+        // });
+        func(input)
     }
     insert(urls) {
         let num = Array.apply(null, {length: urls.length/2}).map(Number.call, Number);
@@ -27,7 +28,7 @@ class CustomDataBase{
             console.log(`Rows inserted ${this.changes}`);
         });
     }
-    select(host) {
+    select(host, cb) {
         let sql = `SELECT URL, Host
            FROM Webpage
            WHERE Host = ?`;
@@ -36,10 +37,12 @@ class CustomDataBase{
             if (err) {
                 return console.error(err.message);
             }
-            rows.forEach((row) => {
-                console.log(row);
-            });
+            cb(rows)
         });
+
+        // temp = rows
+        // console.log(temp)
+        // return CustomDataBase.prototype.db.temp
     }
     close(){
         this.db.close()

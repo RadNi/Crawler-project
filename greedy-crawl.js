@@ -8,13 +8,14 @@ var parser = require('url-parse');
 var db = new DB();
 
 
-var baseURLS = ['http://www.google.com/','http://www.yahoo.com', 'http://www.amazon.com', 'http://www.sharif.ir/home'];
-var depth = 3
-var counter = 0
+var baseURLS = ['http://www.google.com/','http://www.yahoo.com', 'http://www.amazon.com', 'http://www.sharif.ir/home',
+    'http://youtube.com'];
+var depth = 3;
+var counter = 0;
 
-var urls = new Set()
+var urls = new Set();
 
-var beforeTime = new Date()
+var beforeTime = new Date();
 
 
 var c = new Crawler({
@@ -51,7 +52,7 @@ var c = new Crawler({
                             temp = []
                             temp.push(tags[a].attribs.href, parser(tags[a].attribs.href, true).hostname)
                             console.log(temp)
-                            db.parallelize(db.insert, temp)
+                            db.insert(temp)
                         }
                     }
                 }
