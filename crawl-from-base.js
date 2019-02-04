@@ -32,6 +32,8 @@ db.select(url, function (rows) {
 
     // console.log(temp);
     urls = new Set(temp);
+    urls.add(baseURL);
+    // console.log(urls)
 
     // var urls = new Set();
 
@@ -43,9 +45,11 @@ db.select(url, function (rows) {
         maxConnections: 100000,
         retries: 0,
         skipDuplicates: true,
+        timeout: 5000,
         preRequest: function(options, done) {
             // console.log("here", counter)
             counter ++;
+            console.log(options.uri, counter)
             if(counter < batchSize) {
                 done();
             }
@@ -67,6 +71,15 @@ db.select(url, function (rows) {
 
                 if ($) {
                     var tags = $("a");
+                    tags.not('[href^="http"],[href^="https"],[href^="mailto:"],[href^="#"]').each(function() {
+                        $(this).attr('href', function(index, value) {
+                            if (value)
+                                if (value.substr(0,1) !== "/") {
+                                    value = window.location.pathname + value;
+                                }
+                            return res.options.uri + value;
+                        });
+                    });
                     // console.log("inja" + " " + res.body)
                     // console.log($)
                     for (var a = 0; a < tags.length; a++) {

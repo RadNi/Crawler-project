@@ -34,6 +34,8 @@ db.select(url, function (rows) {
 
     // console.log(temp);
     urls = new Set(temp);
+    urls.add(url)
+    console.log(urls)
 
     // var urls = new Set();
 
@@ -45,6 +47,7 @@ db.select(url, function (rows) {
         maxConnections: 1,
         retries: 0,
         skipDuplicates: true,
+        timeout: 5000,
         preRequest: function(options, done) {
             // console.log("here", counter)
             counter ++;
@@ -69,27 +72,37 @@ db.select(url, function (rows) {
 
                 if ($) {
                     var tags = $("a");
+                    tags.not('[href^="http"],[href^="https"],[href^="mailto:"],[href^="#"]').each(function() {
+                        $(this).attr('href', function(index, value) {
+                            if (value)
+                                if (value.substr(0,1) !== "/") {
+                                    value = window.location.pathname + value;
+                                }
+                            return res.options.uri + value;
+                        });
+                    });
                     // console.log("inja" + " " + res.body)
                     // console.log($)
                     for (var a = 0; a < tags.length; a++) {
-                        // console.log(res.request.uri.href+ " " + tags.length)
+                        // console.log(JSON.stringify(tags[a].attribs)+ " " + tags.length)
 
                         if (tags[a].attribs.href) {
                             // console.log(res.request.uri.href)
 
-                            if (tags[a].attribs.href.startsWith("www") || tags[a].attribs.href.startsWith("http") || tags[a].attribs.href.startsWith("https")) {
+                            if (tags[a].attribs.href.startsWith("www") || tags[a].attribs.href.startsWith("http") ||
+                                tags[a].attribs.href.startsWith("https")) {
                                 // console.log(res.request.uri.href)
                                 // console.log("in", tags[a].attribs.href)
                                 // console.log(parser(baseURL, true))
                                 try {
-                                    if (parser(tags[a].attribs.href, true).hostname === parser(baseURL, true).hostname) {
-                                        // console.log("befor:", urls.size);
+                                    if (parser(tags[a].attribs.href, true).hostname === parser(baseURL, true).hostname){
+                                        // console.log("befor:", tags[a].attribs.href);
                                         urls.add(tags[a].attribs.href)
                                         // console.log("after:", urls.size);
                                     } else {
-                                        // console.log(parser(tags[a].attribs.href, true).hostname, baseURL)
+                                        // console.log("Can't add", parser(tags[a].attribs.href, true).hostname, baseURL)
                                     }
-                                    temp = []
+                                    temp = [];
                                     temp.push(tags[a].attribs.href, parser(tags[a].attribs.href, true).hostname)
                                     // console.log(temp)
                                     db.insert(temp)

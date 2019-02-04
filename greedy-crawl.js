@@ -28,6 +28,7 @@ var c = new Crawler({
     maxConnections : 100000,
     retries: 1,
     skipDuplicates: true,
+    timeout: 5000,
     // preRequest: function(options, done) {
     //
     //     // console.log("This request: ", options.uri)
@@ -44,6 +45,15 @@ var c = new Crawler({
 
             if($) {
                 var tags = $("a");
+                tags.not('[href^="http"],[href^="https"],[href^="mailto:"],[href^="#"]').each(function() {
+                    $(this).attr('href', function(index, value) {
+                        if (value)
+                            if (value.substr(0,1) !== "/") {
+                                value = window.location.pathname + value;
+                            }
+                        return res.options.uri + value;
+                    });
+                });
                 // console.log("inja" + " " + res.body)
                 // console.log($)
                 for (var a = 0; a < tags.length; a++) {
@@ -54,10 +64,10 @@ var c = new Crawler({
 
                         if (tags[a].attribs.href.startsWith("www") || tags[a].attribs.href.startsWith("http") || tags[a].attribs.href.startsWith("https")) {
                             // console.log(res.request.uri.href)
-                            urls.add(tags[a].attribs.href)
-                            temp = []
-                            temp.push(tags[a].attribs.href, parser(tags[a].attribs.href, true).hostname)
-                            console.log(temp)
+                            urls.add(tags[a].attribs.href);
+                            temp = [];
+                            temp.push(tags[a].attribs.href, parser(tags[a].attribs.href, true).hostname);
+                            console.log(temp);
                             db.insert(temp)
                         }
                     }
