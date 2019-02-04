@@ -1,4 +1,4 @@
 # Crawler-project
 A simple crawler based on NodeJS
 
-Under requierement and test study
+Under requirement and test study
