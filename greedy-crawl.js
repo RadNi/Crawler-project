@@ -8,10 +8,15 @@ var parser = require('url-parse');
 var db = new DB();
 
 
-var baseURLS = ['http://www.google.com/','http://www.yahoo.com', 'http://www.amazon.com', 'http://www.sharif.ir/home',
-    'http://youtube.com'];
-var depth = 3;
+// var baseURLS = ['http://www.google.com/','http://www.yahoo.com', 'http://www.amazon.com', 'http://www.sharif.ir/home',
+//     'http://youtube.com'];
+// var depth = 3;
 var counter = 0;
+
+var baseURLS = JSON.parse(process.env.npm_package_config_baseURLS);
+var batchSize = process.env.npm_package_config_batchSize;
+var depth = process.env.npm_package_config_depth;
+
 
 var urls = new Set();
 
@@ -34,7 +39,7 @@ var c = new Crawler({
         }else {
             var $ = res.$;
             counter ++;
-            console.log(res.request.uri.href + " link numbers:" + urls.size + " website crawled: " + counter);
+            // console.log(res.request.uri.href + " link numbers:" + urls.size + " website crawled: " + counter);
 
             if($) {
                 var tags = $("a");
@@ -58,7 +63,7 @@ var c = new Crawler({
                 }
             }
             else {
-                console.log("hereee")
+                // console.log("hereee")
             }
             done();
         }
@@ -69,7 +74,7 @@ c.queue(baseURLS);
 // c.queue("http://www.sharif.ir/home");
 c.on('drain',function(){
     depth--;
-    if (depth<=0) {
+    if (depth<=0 || counter>= batchSize) {
         console.log(urls);
         console.log("size:", urls.size, " counter:", counter)
         console.log(beforeTime.getHours() + ":" + beforeTime.getMinutes() + ":" + beforeTime.getSeconds())

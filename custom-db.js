@@ -25,7 +25,7 @@ class CustomDataBase{
             if (err) {
                 return console.error(err.message);
             }
-            console.log(`Rows inserted ${this.changes}`);
+            // console.log(`Rows inserted ${this.changes}`);
         });
     }
     select(host, cb) {

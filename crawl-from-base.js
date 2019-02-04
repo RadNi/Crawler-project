@@ -7,18 +7,23 @@ const parser = require('url-parse');
 const lodash = require('lodash');
 
 var db = new DB();
-var baseURL = 'http://www.google.com';
-var batchSize = 600;
-var depth = 2;
+var baseURL = JSON.parse(process.env.npm_package_config_baseURLS);
+var batchSize = process.env.npm_package_config_batchSize;
+var depth = process.env.npm_package_config_depth;
+
+console.log(`Start crawling from base ${baseURL} with batch size of ${batchSize} and with ${depth} depth`);
+
 
 
 url = parser(baseURL, true).hostname;
+console.log(url);
 // tmp = parser(baseURL, true)
 // console.log(tmp)
 
 db.select(url, function (rows) {
     var temp = [];
     var counter = 0;
+    // console.log(rows)
     for (var i = 0; i < rows.length; i++)
         temp.push(rows[i].URL)
 
@@ -39,13 +44,13 @@ db.select(url, function (rows) {
         retries: 0,
         skipDuplicates: true,
         preRequest: function(options, done) {
-            console.log("here", counter)
+            // console.log("here", counter)
             counter ++;
             if(counter < batchSize) {
                 done();
             }
             else {
-                console.log("ine?!")
+                // console.log("ine?!")
                 // console.log(urls);
                 // console.log("depth:", depth, " counter:", counter)
                 // console.log(beforeTime.getHours() + ":" + beforeTime.getMinutes() + ":" + beforeTime.getSeconds());
@@ -58,7 +63,7 @@ db.select(url, function (rows) {
                 done()
             } else {
                 var $ = res.$;
-                console.log(res.request.uri.href + " link numbers:" + urls.size + " website crawled: " + counter);
+                // console.log(res.request.uri.href + " link numbers:" + urls.size + " website crawled: " + counter);
 
                 if ($) {
                     var tags = $("a");
@@ -76,11 +81,11 @@ db.select(url, function (rows) {
                                 // console.log(parser(baseURL, true))
                                 try {
                                     if (parser(tags[a].attribs.href, true).hostname === parser(baseURL, true).hostname) {
-                                        console.log("befor:", urls.size);
+                                        // console.log("befor:", urls.size);
                                         urls.add(tags[a].attribs.href)
-                                        console.log("after:", urls.size);
+                                        // console.log("after:", urls.size);
                                     } else {
-                                        console.log(parser(tags[a].attribs.href, true).hostname, baseURL)
+                                        // console.log(parser(tags[a].attribs.href, true).hostname, baseURL)
                                     }
                                     temp = []
                                     temp.push(tags[a].attribs.href, parser(tags[a].attribs.href, true).hostname)
@@ -95,7 +100,7 @@ db.select(url, function (rows) {
                     }
                 }
                 else{
-                    console.log("hereee")
+                    // console.log("hereee")
                 }
                 done();
             }
@@ -109,9 +114,9 @@ db.select(url, function (rows) {
         console.log(beforeTime.getHours() + ":" + beforeTime.getMinutes() + ":" + beforeTime.getSeconds());
         console.log(new Date().getHours() + ":" + new Date().getMinutes() + ":" + new Date().getSeconds());
         if(counter > 0){
-            console.log("in iff")
+            // console.log("in iff")
             if(depth > 0) {
-                console.log("depth--", urls.size)
+                console.log(urls.size)
                 depth--;
                 c.queue(Array.from(urls));
             }
