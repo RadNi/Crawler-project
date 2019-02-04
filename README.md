@@ -1,13 +1,13 @@
 # Crawler-project
 A simple crawler based on NodeJS
 
-##Installation
+## Installation
 
 `npm update`
 
 `npm run database_init`
 
-##Available Configs
+## Available Configs
     {
         baseURLS: Array of base URLS
         batchSize: Maximum number of requests
@@ -28,7 +28,7 @@ Setting new configs:
     npm config set crawler-project:timeout 5000
     npm config set crawler-project:maxcon 10
 
-###Usage
+## Usage
 
 For greedy crawling use:
 
