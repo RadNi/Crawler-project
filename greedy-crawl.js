@@ -17,6 +17,7 @@ var baseURLS = JSON.parse(process.env.npm_package_config_baseURLS);
 var batchSize = process.env.npm_package_config_batchSize;
 var depth = process.env.npm_package_config_depth;
 
+console.log(`Start crawling from base ${baseURL} with batch size of ${batchSize} and with ${depth} depth`);
 
 var urls = new Set();
 

@@ -6,12 +6,14 @@
   "scripts": {
     "greedy": "node greedy-crawl.js --max_old_space_size=2000000",
     "base": "node crawl-from-base.js --max_old_space_size=2000000",
-    "test": "node test.js --max_old_space_size=2000000"
+    "test": "node test.js --max_old_space_size=2000000",
+    "time": "node timeout-crawl.js --max_old_space_size=2000000"
   },
   "config": {
     "baseURLS": [],
     "batchSize": 0,
-    "depth": 0
+    "depth": 0,
+    "time": 0
   },
   "author": "radni",
   "license": "ISC",
