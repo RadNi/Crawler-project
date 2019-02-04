@@ -16,19 +16,23 @@ var counter = 0;
 var baseURLS = JSON.parse(process.env.npm_package_config_baseURLS);
 var batchSize = process.env.npm_package_config_batchSize;
 var depth = process.env.npm_package_config_depth;
+var maxcon = process.env.npm_package_config_maxcon;
+var retries = process.env.npm_package_config_retries;
+var timeout = process.env.npm_package_config_timeout;
 
 console.log(`Start crawling from base ${baseURL} with batch size of ${batchSize} and with ${depth} depth`);
 
 var urls = new Set();
+urls.add(baseURLS)
 
 var beforeTime = new Date();
 
 
 var c = new Crawler({
-    maxConnections : 100000,
-    retries: 1,
+    maxConnections : maxcon,
+    retries: retries,
     skipDuplicates: true,
-    timeout: 5000,
+    timeout: timeout,
     // preRequest: function(options, done) {
     //
     //     // console.log("This request: ", options.uri)

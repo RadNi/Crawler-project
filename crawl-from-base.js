@@ -10,6 +10,10 @@ var db = new DB();
 var baseURL = JSON.parse(process.env.npm_package_config_baseURLS);
 var batchSize = process.env.npm_package_config_batchSize;
 var depth = process.env.npm_package_config_depth;
+var maxcon = process.env.npm_package_config_maxcon;
+var retries = process.env.npm_package_config_retries;
+var timeout = process.env.npm_package_config_timeout;
+var time_int = process.env.npm_package_config_time;
 
 console.log(`Start crawling from base ${baseURL} with batch size of ${batchSize} and with ${depth} depth`);
 
@@ -42,15 +46,16 @@ db.select(url, function (rows) {
 
 
     var c = new Crawler({
-        maxConnections: 100000,
-        retries: 0,
+        maxConnections: maxcon,
+        retries: retries,
         skipDuplicates: true,
-        timeout: 5000,
+        timeout: timeout,
         preRequest: function(options, done) {
             // console.log("here", counter)
             counter ++;
             console.log(options.uri, counter)
             if(counter < batchSize) {
+                setTimeout(done, time_int)
                 done();
             }
             else {
