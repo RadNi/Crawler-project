@@ -10,7 +10,7 @@ var db = new DB();
 
 
 
-db.db.run('CREATE TABLE IF NOT EXISTS test (URL TEXT PRIMARY KEY , Host TEXT);', (err) => {
+db.db.run('CREATE TABLE IF NOT EXISTS Webpage (URL TEXT PRIMARY KEY , Host TEXT);', (err) => {
     if (err) {
         console.log('ERROR!', err)
     }
