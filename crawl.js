@@ -26,6 +26,7 @@ if(greedyMode === true) {
 else {
     baseURL = JSON.parse(process.env.npm_package_config_baseURLS)[0];
     url = parser(baseURL, true).hostname;
+    var temp_base = parser(baseURL).hostname.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").split('/')[0];
 }
 
 
@@ -44,6 +45,7 @@ var beforeTime = new Date();
 var urls = new Set();
 
 var temp_index = 0;
+var temp_depth = 1;
 function cb(error, res, done) {
     // counter++;
     if (error) {
@@ -51,32 +53,68 @@ function cb(error, res, done) {
         done()
     } else {
         // console.log(res.options);
+        var current_base = parser(res.request.uri.href, true).hostname.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").split('/')[0];
+
         var $ = res.$;
         console.log(res.request.uri.href + " link numbers:" + urls.size + " website crawled: " + ++temp_index + " counter: " + counter);
-
+        if(greedyMode === false) {
+            if (current_base !== temp_base) {
+                console.log("Redirect link :(", parser(res.request.uri.href).hostname, parser(baseURL).hostname)
+            }
+        }
         if ($) {
             var tags = $("a");
+            // console.log(parser(res.options.uri));
             tags.not('[href^="http"],[href^="https"],[href^="mailto:"],[href^="#"]').each(function() {
                 // console.log(global);
                 // console.log(res.document);
 
                 $(this).attr('href', function(index, value) {
-
+                    // console.log(parser(res.options.uri), value);
                     // console.log(res.options.uri);
                     if (value) {
                         if (value.substr(0, 2) === "//") {
+                            // console.log("aaa", "http:" + value);
                             return "http:" + value
                         }
-                        else if (value.substr(0, 1) !== "/") {
-                            try {
-                                // console.log("bbb", value);
-                                value = window.location.pathname + value;
-                            } catch (err) {
-                                // console.log("ee")
-                            }
+                        else if (value.substr(0, 1) === "/") {
+                            // console.log("bbb", parser(res.options.uri).origin + value);
+                            return parser(res.options.uri).origin + value
+                            // temp = res.options.uri.substr(parser(res.options.uri).protocol.length+2);
+                            // if(temp.includes("/")) {
+                            //     splited = temp.split("/");
+                            //     splited.pop(splited[splited.length - 1]);
+                            //     console.log("aaa");
+                            //     console.log(splited.join("/"), value);
+                            //     return splited.join("/") + value
+                            // }else {
+                            //     console.log("ppp");
+                            //     console.log(res.options.uri, value);
+                            //     return res.options.uri + value
+                            // }
                         }
+
+                        else if (value.substr(0, 1) === ".") {
+                            // console.log(parser(res.options.uri), value);
+                            // console.log("ccc", parser(res.options.uri).pathname + value);
+                            return parser(res.options.uri).pathname + value
+                            // try {
+                            //     // console.log("bbb");
+                            //     value = window.location.pathname + value;
+                            // } catch (err) {
+                            //     console.log("ee")
+                            //     console.log(value)
+                            // }
+                        }
+                        else {
+                            // console.log("why?!")
+                            // console.log(parser(res.options.uri).origin + "/" +value);
+                            return parser(res.options.uri).origin + "/" +value;
+                        }
+                    } else {
+                        // console.log("what the hell", index)
                     }
-                    return parser(res.options.uri).origin + value;
+                    // return res.options.uri + value
                 });
             });
             // console.log("inja" + " " + res.body)
@@ -108,7 +146,7 @@ function cb(error, res, done) {
                                 urls.add(tags[a].attribs.href)
                             }
                             else {
-                                if (parser(tags[a].attribs.href, true).hostname === parser(baseURL, true).hostname) {
+                                if (current_base === temp_base) {
                                     // console.log("inja", tags[a].attribs.href);
                                     urls.add(tags[a].attribs.href)
                                 }
@@ -167,9 +205,9 @@ c.on('drain', function () {
     // console.log(new Date().getHours() + ":" + new Date().getMinutes() + ":" + new Date().getSeconds());
     if (batchSize > counter) {
         // console.log("in iff")
-        if (depth > 0) {
+        if (depth >= temp_depth) {
             console.log(urls.size);
-            depth--;
+            temp_depth++;
 
             // if (urls.size > index)
             //     c.queue(Array.from(urls)[index++]);
@@ -182,6 +220,7 @@ if(greedyMode === true){
     c.queue(baseURLS)
 } else {
     console.log(baseURL);
+    db.insert([baseURL, parser(baseURL).hostname])
     c.queue(baseURL);
     db.select(url, function (rows) {
         var temp = [];
