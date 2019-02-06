@@ -137,7 +137,7 @@ var c = new Crawler({
 });
 c.on('drain', function () {
     // console.log(urls);
-    console.log("Depth of iteration:", depth);
+    console.log("Depth of iteration:", temp_depth);
     console.log("Number of crawled pages:", counter);
     console.log("Time of execution:", new Date() - beforeTime, "milliseconds");
     if (batchSize > counter) {
